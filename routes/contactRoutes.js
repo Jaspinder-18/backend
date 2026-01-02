@@ -66,18 +66,20 @@ router.put('/:id/read', authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-  // DELETE contact message (Admin only)
-  router.delete('/:id', authenticateToken, async (req, res) => {
-    try {
-      const message = await ContactMessage.findByIdAndDelete(req.params.id);
-      if (!message) {
-        return res.status(404).json({ message: 'Message not found' });
-      }
-      res.json({ message: 'Message deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+});
 
-  export default router;
+// DELETE contact message (Admin only)
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    const message = await ContactMessage.findByIdAndDelete(req.params.id);
+    if (!message) {
+      return res.status(404).json({ message: 'Message not found' });
+    }
+    res.json({ message: 'Message deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+export default router;
 
