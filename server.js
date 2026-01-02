@@ -7,6 +7,7 @@ import connectDB from './config/db.js';
 import menuRoutes from './routes/menuRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
+import offerRoutes from './routes/offerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import contentRoutes from './routes/contentRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
