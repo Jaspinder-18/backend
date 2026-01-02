@@ -19,22 +19,22 @@ router.post('/', [
       console.error('Validation errors:', errors.array());
       // Return first error message for simplicity, or all errors
       const errorMessages = errors.array().map(err => err.msg).join(', ');
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: errorMessages,
-        errors: errors.array() 
+        errors: errors.array()
       });
     }
 
     const { name, email, phone, message } = req.body;
     const contactMessage = new ContactMessage({ name, email, phone, message });
     await contactMessage.save();
-    
+
     console.log('Contact message saved successfully:', contactMessage._id);
     res.status(201).json({ message: 'Thank you for contacting us! We will get back to you soon.' });
   } catch (error) {
     console.error('Contact form error:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ 
+    res.status(500).json({
       message: error.message || 'Failed to send message. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
@@ -66,7 +66,18 @@ router.put('/:id/read', authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+  // DELETE contact message (Admin only)
+  router.delete('/:id', authenticateToken, async (req, res) => {
+    try {
+      const message = await ContactMessage.findByIdAndDelete(req.params.id);
+      if (!message) {
+        return res.status(404).json({ message: 'Message not found' });
+      }
+      res.json({ message: 'Message deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
-export default router;
+  export default router;
 
