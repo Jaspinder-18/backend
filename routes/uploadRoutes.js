@@ -1,29 +1,22 @@
 import express from 'express';
 import multer from 'multer';
+import ImageKit from 'imagekit';
+import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+
+dotenv.config();
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Configure storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads');
-        // Ensure directory exists
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+// Initialize ImageKit
+const imagekit = new ImageKit({
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT
 });
+
+// Configure storage (Memory storage for ImageKit)
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -43,20 +36,28 @@ const upload = multer({
 });
 
 // Upload endpoint
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
 
-        // Return the path to the uploaded file
-        const filePath = `/uploads/${req.file.filename}`;
+        // Upload to ImageKit
+        const result = await imagekit.upload({
+            file: req.file.buffer, // required
+            fileName: req.file.originalname, // required
+            folder: '/eat-and-out/' // Optional: Organize images in a folder
+        });
+
         res.json({
             message: 'File uploaded successfully',
-            filePath: filePath
+            filePath: result.url,
+            fileId: result.fileId,
+            thumbnailUrl: result.thumbnailUrl
         });
+
     } catch (error) {
-        console.error(error);
+        console.error('ImageKit upload error:', error);
         res.status(500).json({ message: 'Server error during upload' });
     }
 });
