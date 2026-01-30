@@ -3,20 +3,11 @@ import Offer from '../models/Offer.js';
 import { authenticateToken } from '../middleware/auth.js';
 import multer from 'multer';
 import path from 'path';
+import { uploadToImageKit } from '../utils/imagekit.js';
 
 const router = express.Router();
 
-// Multer setup (reuse if possible, but for now simple setup)
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, 'offer-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage: storage });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // GET all active offers (Public)
 router.get('/active', async (req, res) => {
@@ -48,7 +39,7 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
 
         let imagePath = '';
         if (req.file) {
-            imagePath = `/uploads/${req.file.filename}`;
+            imagePath = await uploadToImageKit(req.file);
         }
 
         // Parse displayLocation if it comes as a JSON string (common with FormData)
@@ -114,7 +105,7 @@ router.put('/:id', authenticateToken, upload.single('image'), async (req, res) =
         };
 
         if (req.file) {
-            updateData.image = `/uploads/${req.file.filename}`;
+            updateData.image = await uploadToImageKit(req.file);
         }
 
         const offer = await Offer.findByIdAndUpdate(req.params.id, updateData, { new: true });
