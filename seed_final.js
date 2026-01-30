@@ -14,13 +14,13 @@ const connectDB = async () => {
             console.warn('Warning: No URI found in env, using local default.');
             uri = 'mongodb://localhost:27017/eatandout';
         }
-        await mongoose.connect(uri);
+        await mongoose.connect(uri, { dbName: 'eatandout' });
         console.log('MongoDB connected to:', uri);
     } catch (err) {
         console.error('Connection error:', err.message);
         if (err.message.includes('ECONNREFUSED')) {
             try {
-                await mongoose.connect('mongodb://127.0.0.1:27017/eatandout');
+                await mongoose.connect('mongodb://127.0.0.1:27017/eatandout', { dbName: 'eatandout' });
                 console.log('Connected via 127.0.0.1');
                 return;
             } catch (inner) { console.error(inner); }
