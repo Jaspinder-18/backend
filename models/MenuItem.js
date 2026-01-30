@@ -12,9 +12,15 @@ const menuItemSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
+    required: function () { return !this.variants || this.variants.length === 0; },
     min: 0
   },
+  variants: [
+    {
+      name: { type: String, required: true }, // e.g., 'Small', 'Medium', 'Large'
+      price: { type: Number, required: true, min: 0 }
+    }
+  ],
   category: {
     type: String,
     required: true,
