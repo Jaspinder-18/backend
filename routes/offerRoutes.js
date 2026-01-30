@@ -41,17 +41,38 @@ router.get('/', authenticateToken, async (req, res) => {
 // POST create offer (Admin)
 router.post('/', authenticateToken, upload.single('image'), async (req, res) => {
     try {
-        const { title, description, isActive } = req.body;
+        const {
+            title, description, isActive, category, buttonText,
+            redirectLink, priority, displayLocation, startDate, endDate
+        } = req.body;
+
         let imagePath = '';
         if (req.file) {
             imagePath = `/uploads/${req.file.filename}`;
+        }
+
+        // Parse displayLocation if it comes as a JSON string (common with FormData)
+        let parsedLocations = displayLocation;
+        try {
+            if (typeof displayLocation === 'string') {
+                parsedLocations = JSON.parse(displayLocation);
+            }
+        } catch (e) {
+            parsedLocations = [displayLocation]; // Fallback
         }
 
         const offer = new Offer({
             title,
             description,
             image: imagePath,
-            isActive: isActive === 'true'
+            isActive: isActive === 'true',
+            category,
+            buttonText,
+            redirectLink,
+            priority,
+            displayLocation: parsedLocations,
+            startDate: startDate || Date.now(),
+            endDate
         });
 
         await offer.save();
@@ -65,12 +86,33 @@ router.post('/', authenticateToken, upload.single('image'), async (req, res) => 
 // PUT update offer
 router.put('/:id', authenticateToken, upload.single('image'), async (req, res) => {
     try {
-        const { title, description, isActive } = req.body;
+        const {
+            title, description, isActive, category, buttonText,
+            redirectLink, priority, displayLocation, startDate, endDate
+        } = req.body;
+
+        let parsedLocations = displayLocation;
+        try {
+            if (typeof displayLocation === 'string') {
+                parsedLocations = JSON.parse(displayLocation);
+            }
+        } catch (e) {
+            // keep as is or ignore
+        }
+
         const updateData = {
             title,
             description,
-            isActive: isActive === 'true'
+            isActive: isActive === 'true',
+            category,
+            buttonText,
+            redirectLink,
+            priority,
+            displayLocation: parsedLocations,
+            startDate,
+            endDate
         };
+
         if (req.file) {
             updateData.image = `/uploads/${req.file.filename}`;
         }

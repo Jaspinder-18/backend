@@ -11,6 +11,7 @@ import offerRoutes from './routes/offerRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import contentRoutes from './routes/contentRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/offers', offerRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
