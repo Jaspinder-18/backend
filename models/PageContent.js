@@ -47,6 +47,11 @@ const pageContentSchema = new mongoose.Schema({
     facebook: { type: String, default: '' },
     instagram: { type: String, default: '' },
     twitter: { type: String, default: '' }
+  },
+  menu: {
+    title: { type: String, default: 'Our' },
+    subtitle: { type: String, default: 'Menu' },
+    description: { type: String, default: 'Explore our delicious selection of authentic dishes from North Indian, Punjabi, Chinese, and Fast Food cuisines.' }
   }
 }, {
   timestamps: true

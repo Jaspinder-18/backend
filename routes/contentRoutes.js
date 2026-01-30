@@ -29,6 +29,7 @@ router.put('/', authenticateToken, async (req, res) => {
         if (req.body.gallery) content.gallery = { ...content.gallery, ...req.body.gallery };
         if (req.body.contact) content.contact = { ...content.contact, ...req.body.contact };
         if (req.body.socialLinks) content.socialLinks = { ...content.socialLinks, ...req.body.socialLinks };
+        if (req.body.menu) content.menu = { ...content.menu, ...req.body.menu };
 
         const updatedContent = await content.save();
         res.json(updatedContent);
